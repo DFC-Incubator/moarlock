@@ -19,6 +19,12 @@ post-analysis staging and provenance (demo)
 	* parmName | parmVal | iRODS:Analsys:Param
 	...etc
 	
+
+
+
+## target docker run
+
+docker run -rm -v irodsabspathtoparent:/var/input-e "host=xxx" -e "port=xxx" -e "zone=xxx" -e "user=xxx" -e "passwd=xxxx" -e "irodsout=yyy" -e "parm1=xxx" -e "parm2=xxx" -e "parm3=xxx" -e "parm4=xxx" -e "guid=xxx"  diceunc/moarlock 
 	
 	
 
