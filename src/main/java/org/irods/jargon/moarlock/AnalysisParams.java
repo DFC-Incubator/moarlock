@@ -4,10 +4,10 @@ import java.util.Properties;
 
 public class AnalysisParams {
 
-	private final Properties params = new Properties();
-	private final String inputMount = "";
-	private final String outputMount = "";
-	private final String GUID = "";
+	private Properties params = new Properties();
+	private String inputMount = "";
+	private String outputMount = "";
+	private String GUID = "";
 
 	public Properties getParams() {
 		return params;
@@ -29,6 +29,22 @@ public class AnalysisParams {
 	public String toString() {
 		return "AnalysisParams [params=" + params + ", inputMount=" + inputMount + ", outputMount=" + outputMount
 				+ ", GUID=" + GUID + "]";
+	}
+
+	public void setParams(final Properties params) {
+		this.params = params;
+	}
+
+	public void setInputMount(final String inputMount) {
+		this.inputMount = inputMount;
+	}
+
+	public void setOutputMount(final String outputMount) {
+		this.outputMount = outputMount;
+	}
+
+	public void setGUID(final String gUID) {
+		GUID = gUID;
 	}
 
 }
