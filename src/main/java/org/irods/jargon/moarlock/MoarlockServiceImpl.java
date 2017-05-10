@@ -106,7 +106,7 @@ public class MoarlockServiceImpl extends AbstractJargonService {
 		irodsAnalysisDir.mkdirs();
 		final File localOutput = new File(analysisParams.getInputMount());
 		File mdManifestFile = null;
-		if (localOutput.exists()) {
+		if (!localOutput.exists()) {
 			log.error("cannot find output directory for app:{}", localOutput);
 			throw new JargonException("cannot find local output to stage");
 		}
