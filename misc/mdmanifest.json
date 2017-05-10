@@ -1,0 +1,1 @@
+{"operation":[{"attribute":"atr1","value":"val1","unit":"","irodsPath":"testFile0.txt","action":"ADD"}],"failureMode":"FAIL_FAST","parentIrodsTargetPath":"/zone1/home/test1/jargon-scratch/MoarlockServiceImplTest/testProcessAnalysis"}
