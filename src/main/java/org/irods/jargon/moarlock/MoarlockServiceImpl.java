@@ -8,10 +8,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.packinstr.TransferOptions.ForceOption;
 import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
@@ -19,6 +22,8 @@ import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.service.AbstractJargonService;
+import org.irods.jargon.core.transfer.DefaultTransferControlBlock;
+import org.irods.jargon.core.transfer.TransferControlBlock;
 import org.irods.jargon.core.utils.LocalFileUtils;
 import org.irods.jargon.datautils.metadatamanifest.MetadataManifestProcessor;
 import org.irods.jargon.datautils.metadatamanifest.MetadataManifestProcessorImpl;
@@ -111,6 +116,9 @@ public class MoarlockServiceImpl extends AbstractJargonService {
 			throw new JargonException("cannot find local output to stage");
 		}
 
+		final TransferControlBlock transferControlBlock = DefaultTransferControlBlock.instance();
+		transferControlBlock.getTransferOptions().setForceOption(ForceOption.USE_FORCE);
+
 		final DataTransferOperations dto = this.getIrodsAccessObjectFactory()
 				.getDataTransferOperations(getIrodsAccount());
 
@@ -123,7 +131,7 @@ public class MoarlockServiceImpl extends AbstractJargonService {
 				mdManifestFile = file;
 			} else {
 				log.info("staging file");
-				dto.putOperation(file, irodsAnalysisDir, null, null);
+				dto.putOperation(file, irodsAnalysisDir, null, transferControlBlock);
 			}
 		}
 
@@ -166,9 +174,61 @@ public class MoarlockServiceImpl extends AbstractJargonService {
 		}
 
 		final AnalysisParams analysisParams = new AnalysisParams();
-		final IRODSAccount irodsAccount = null;
+		IRODSAccount irodsAccount;
 		final IRODSFileSystem irodsFileSystem = IRODSFileSystem.instance();
 		// fill in with args
+
+		if (args.length < 6) {
+			throw new IllegalArgumentException("should be at least six arguments");
+		}
+
+		final String outputDir = args[0];
+		log.info("outputdir:{}", outputDir);
+
+		final String host = args[1];
+		log.info("host:{}", host);
+
+		final String portStr = args[2];
+		final int port = Integer.parseInt(portStr);
+		log.info("port:{}", port);
+
+		final String zone = args[3];
+		log.info("zone:{}", zone);
+
+		final String user = args[4];
+		log.info("user:{}", user);
+
+		final String password = args[5];
+		log.info("password:******");
+
+		String guid;
+
+		if (args.length == 7) {
+			log.info("guid provided");
+			guid = args[6];
+		} else {
+			log.info("guid generated");
+			guid = UUID.randomUUID().toString();
+		}
+		final Properties props = new Properties();
+
+		log.info("record addl args");
+		for (int i = 7; i < args.length; i++) {
+			log.info("arg:{}", args[i]);
+			final String[] split = args[i].split("=");
+			props.put(split[0], split[1]);
+
+		}
+
+		log.info("props:{}", props);
+		irodsAccount = new IRODSAccount(host, port, user, password, "", zone, "");
+		log.info("irodsAccount:{}", irodsAccount);
+
+		analysisParams.setGUID(guid);
+		analysisParams.setOutputMount(outputDir);
+		analysisParams.setInputMount("/var/input");
+		analysisParams.setParams(props);
+
 		final MoarlockServiceImpl moarlockServiceImpl = new MoarlockServiceImpl(
 				irodsFileSystem.getIRODSAccessObjectFactory(), irodsAccount, analysisParams);
 		moarlockServiceImpl.processAnalysis();
